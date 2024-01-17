@@ -19,6 +19,7 @@ Default output format [None]:
 ```
 
 ## Clone repository
+```sh
 $ git clone https://github.com/cpjboon/terraform-aws-kubernetes.git
 $ cd terraform-aws-kubernetes
 $ mkdir .ssh
@@ -53,7 +54,7 @@ variable "deployer_key" {
   type        = string
   default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key"
 }
-
+```
 
 ## Create a cluster
 
