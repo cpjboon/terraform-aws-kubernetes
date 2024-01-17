@@ -155,6 +155,7 @@ Last login: Wed Jan 17 16:57:07 2024 from 84.105.22.173
 ```
 
 ## View cluster
+```sh
 ubuntu@master0:~$ sudo -i
 root@master0:~# k get nodes
 NAME      STATUS   ROLES           AGE     VERSION
