@@ -52,5 +52,5 @@
 
     - name: show master ip
       ansible.builtin.debug:
-        msg: "To connect to the master node: ssh -i .ssh/id_rsa ubuntu@{{ inventory_hostname }}" 
+        msg: "To connect to the master node: ssh -i .ssh/id_rsa-tf ubuntu@{{ inventory_hostname }}" 
       when: inventory_hostname in groups['master']
