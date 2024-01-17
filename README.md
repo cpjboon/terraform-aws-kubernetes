@@ -17,7 +17,45 @@ AWS Secret Access Key [****************js5D]:
 Default region name [eu-west-1]: 
 Default output format [None]: 
 ```
-## Setup a cluster
+
+## Clone repository
+$ git clone https://github.com/cpjboon/terraform-aws-kubernetes.git
+$ cd terraform-aws-kubernetes
+$ mkdir .ssh
+$ ssh-keygen -f .ssh/id_rsa-tf -b4096 -C 'terraform aws deployer key'
+Generating public/private ed25519 key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in .ssh/id_rsa-tf
+Your public key has been saved in .ssh/id_rsa-tf.pub
+The key fingerprint is:
+SHA256:C2EBIGh3EuRjeyHs+I2SejiYT2T3YDJA7bmVdOF4Ax0 terraform aws deployer key
+The key's randomart image is:
++--[ED25519 256]--+
+|o.++oooEo        |
+|ooo+ o++         |
+|o o*=o=+         |
+| .+o++o..        |
+| .=o*.. S        |
+| oo*+o . .       |
+|.=.o .. .        |
+|*.o              |
+|.+.              |
++----[SHA256]-----+
+
+$ cat .ssh/id_rsa-tf.pub 
+ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key
+
+$ vim variables.tf
+....
+variable "deployer_key" {
+  description = "the ssh public key to connect to the ec2 servers"
+  type        = string
+  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key"
+}
+
+
+## Create a cluster
 
 ```sh
 $ terraform workspace new eu-west-1
