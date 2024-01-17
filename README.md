@@ -21,6 +21,10 @@ Default output format [None]:
 ## Clone repository
 ```sh
 $ git clone https://github.com/cpjboon/terraform-aws-kubernetes.git
+```
+
+## Create ssh keys or use your own
+```sh
 $ cd terraform-aws-kubernetes
 $ mkdir .ssh
 $ ssh-keygen -f .ssh/id_rsa-tf -b4096 -C 'terraform aws deployer key'
@@ -56,8 +60,7 @@ variable "deployer_key" {
 }
 ```
 
-## Create a cluster
-
+## Create EC2 instances
 ```sh
 $ terraform workspace new eu-west-1
 Created and switched to workspace "eu-west-1"!
@@ -105,6 +108,9 @@ $ terraform plan
 
 $ terraform apply
 ...
+```
 
+## Configure Kubernetes cluster with Ansible
+```sh
 ansible-playbook -i inventory-eu-west-1 install_cluster.yml
 ```
