@@ -45,3 +45,8 @@ variable "worker_size" {
   type        = string
   default     = "t3.small"
 }
+
+variable "deployer_key" {
+  description = "the ssh public key to connect to the ec2 servers"
+  type        = string
+}

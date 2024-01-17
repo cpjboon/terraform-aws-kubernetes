@@ -34,7 +34,7 @@ data "template_file" "init_master" {
 # existing public key to be able to ssh to the instances
 resource "aws_key_pair" "deployer" {
   key_name   = "deployer-key"
-  public_key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEwK74IHj8nSArwcEMtOixhgXP8XNsivi8ohpFRdPfLX chris@arch-linux"
+  public_key = var.deployer_key
 }
 
 # a resource to create random subnets
