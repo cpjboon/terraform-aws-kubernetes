@@ -31,7 +31,7 @@ Your identification has been saved in .ssh/id_rsa-tf
 Your public key has been saved in .ssh/id_rsa-tf.pub
 The key fingerprint is:
 SHA256:C2EBIGh3EuRjeyHs+I2SejiYT2T3YDJA7bmVdOF4Ax0 terraform aws deployer key
-The key's randomart image is:
+The key\'s randomart image is:
 +--[ED25519 256]--+
 |o.++oooEo        |
 |ooo+ o++         |
@@ -104,7 +104,7 @@ $ terraform plan
 ...
 
 $ terraform apply
-....
+...
 
 ansible-playbook -i inventory-eu-west-1 install_cluster.yml
 ```
