@@ -1,56 +1,53 @@
-- name: install Master node
+- name: install Kubernetes Nodes
   hosts: all
   become: true
   vars:
     playbook_lock: /home/ubuntu/deployed.txt
-  tasks:
 
-    - name: Install master node
-      ansible.builtin.script: scripts/install_master.sh
-      args:
-        executable: /bin/bash
-        creates: "{{ playbook_lock }}"
-      when: inventory_hostname in groups['master']
-
-    - name: Install worker nodes
-      ansible.builtin.script: scripts/install_worker.sh
-      args:
-        executable: /bin/bash
-        creates: "{{ playbook_lock }}"
-      when: inventory_hostname in groups['worker']
-
-
-    - name: Get token 
-      ansible.builtin.command: kubeadm token create --print-join-command
-      register: join_command
-      args:
-        creates: "{{ playbook_lock }}"
-      when: inventory_hostname in groups['master']
-      
-
-    - name: set the fact
-      set_fact:
-        execute_this: "{{ join_command['stdout'] }}"
-      when: inventory_hostname in groups['master']
-
-    - name: print fact
-      ansible.builtin.debug:
-        var: execute_this
-
-    - name: execute command on workers
-      ansible.builtin.command: "{{ execute_this }}"
-      when: inventory_hostname in groups['master']
-      delegate_to: "{{ item }}"
-      loop: "{{ groups['worker'] }}"
-      args:
-        creates: "{{ playbook_lock }}"
-    
-    - name: Set file
-      ansible.builtin.file:
+  pre_tasks:
+    - name: check for lock file
+      ansible.builtin.stat:
         path: "{{ playbook_lock }}"
-        state: touch
+      register: lock_file
 
-    - name: show master ip
-      ansible.builtin.debug:
-        msg: "To connect to the master node: ssh -i .ssh/id_rsa-tf ubuntu@{{ inventory_hostname }}" 
-      when: inventory_hostname in groups['master']
+  tasks:
+    - name: Install and Configure Kubernetes Cluster
+      block:
+        - name: Install master node with script
+          ansible.builtin.script: scripts/install_master.sh
+          args:
+            executable: /bin/bash
+          when: inventory_hostname in groups['master']
+
+        - name: Install worker nodes with script
+          ansible.builtin.script: scripts/install_worker.sh
+          args:
+            executable: /bin/bash
+          when: inventory_hostname in groups['worker']
+
+        - name: Get token from master node to join cluster
+          ansible.builtin.command: kubeadm token create --print-join-command
+          register: join_command
+          when: inventory_hostname in groups['master']
+
+        - name: set the output from the join command as a fact
+          set_fact:
+            execute_this: "{{ join_command['stdout'] }}"
+          when: inventory_hostname in groups['master']
+
+        - name: execute join command on worker nodes
+          ansible.builtin.command: "{{ execute_this }}"
+          when: inventory_hostname in groups['master']
+          delegate_to: "{{ item }}"
+          loop: "{{ groups['worker'] }}"
+
+        - name: Set Lock file so that the playbook runs only once
+          ansible.builtin.file:
+            path: "{{ playbook_lock }}"
+            state: touch
+
+        - name: show master ip
+          ansible.builtin.debug:
+            msg: "To connect to the master node: ssh -i .ssh/id_rsa-tf ubuntu@{{ inventory_hostname }}"
+          when: inventory_hostname in groups['master']
+      when: not lock_file.stat.exists|bool
