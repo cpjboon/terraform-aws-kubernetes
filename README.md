@@ -6,7 +6,7 @@
 - terraform binary (https://developer.hashicorp.com/terraform/install)
 - ansible 
 - aws cli
-- a public / private key pair to connect to the ec2 servers (set as default in variables.tf)
+- a public / private key pair to connect to the ec2 servers 
 
 Setup your credentials with ~/.aws/credentials
 
