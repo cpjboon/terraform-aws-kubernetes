@@ -51,15 +51,9 @@ The keys randomart image is:
 $ cat .ssh/id_rsa-tf.pub 
 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key
 
-$ vim variables.tf
-....
-variable "deployer_key" {
-  description = "the ssh public key to connect to the ec2 servers"
-  type        = string
-  default     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key"
-}
+$ vim terraform.tfvars
+deployer_key = ""ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFmMiDzBWT7VjNnT4srA3P+ImbUdfPST4CNG8aoyltyY terraform aws deployer key"
 ```
-
 ## Create EC2 instances
 ```sh
 $ terraform workspace new eu-west-1
