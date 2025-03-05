@@ -1,6 +1,6 @@
 # terraform-aws-kubernetes
 
-## _Install terraform Kubernetes cluster on Amazon_
+## _Install a kubeadm single master Kubernetes test cluster on AWS_
 
 ## Dependencies
 - terraform binary (https://developer.hashicorp.com/terraform/install)
