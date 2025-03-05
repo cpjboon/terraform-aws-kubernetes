@@ -6,30 +6,30 @@ data "aws_availability_zones" "available" {
   state = "available"
 }
 
-resource "aws_vpc" "rabbitmq" {
+resource "aws_vpc" "my_vpc" {
   cidr_block = var.vpc_cidr
 }
 
 resource "aws_subnet" "primary" {
-  vpc_id            = aws_vpc.rabbitmq.id
+  vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = var.subnet_primary_cidr
   availability_zone = data.aws_availability_zones.available.names[0]
 }
 
 resource "aws_subnet" "secondary" {
-  vpc_id            = aws_vpc.rabbitmq.id
+  vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = var.subnet_secondary_cidr
   availability_zone = data.aws_availability_zones.available.names[1]
 }
 
 resource "aws_subnet" "tertiary" {
-  vpc_id            = aws_vpc.rabbitmq.id
+  vpc_id            = aws_vpc.my_vpc.id
   cidr_block        = var.subnet_tertiary_cidr
   availability_zone = data.aws_availability_zones.available.names[2]
 }
 
 resource "aws_internet_gateway" "main_gw" {
-  vpc_id = aws_vpc.rabbitmq.id
+  vpc_id = aws_vpc.my_vpc.id
 
   tags = {
     Name = "main"
@@ -37,7 +37,7 @@ resource "aws_internet_gateway" "main_gw" {
 }
 
 resource aws_route_table "main-public" {
-  vpc_id = aws_vpc.rabbitmq.id
+  vpc_id = aws_vpc.my_vpc.id
   route {
     cidr_block = "0.0.0.0/0"
     gateway_id = aws_internet_gateway.main_gw.id
@@ -62,7 +62,7 @@ resource "aws_route_table_association" "azc" {
 resource "aws_security_group" "allow_ssh" {
   name        = "allow_ssh"
   description = "Allow SSH incoming traffic"
-  vpc_id      = "${aws_vpc.rabbitmq.id}"
+  vpc_id      = "${aws_vpc.my_vpc.id}"
 
   ingress {
     description = "SSH From my IP"
@@ -87,7 +87,7 @@ resource "aws_security_group" "allow_ssh" {
 resource "aws_security_group" "allow_internal_traffic" {
   name        = "allow_internal_traffic"
   description = "Allow internal traffic"
-  vpc_id      = "${aws_vpc.rabbitmq.id}"
+  vpc_id      = "${aws_vpc.my_vpc.id}"
 
   ingress {
     description = "Internal traffic"
