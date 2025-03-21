@@ -108,3 +108,29 @@ resource "aws_security_group" "allow_internal_traffic" {
     Name = "allow_internal_traffic"
   }
 }
+
+
+resource "aws_security_group" "allow_nodeports" {
+  name        = "allow_nodeports"
+  description = "Allow Kubernetes nodeports"
+  vpc_id      = "${aws_vpc.my_vpc.id}"
+
+  ingress {
+    description = "Allow nodeports"
+    from_port   = 30000
+    to_port     = 40000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  tags = {
+    Name = "allow_nodeports"
+  }
+}

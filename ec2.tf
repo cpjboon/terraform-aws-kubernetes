@@ -5,6 +5,7 @@ data "aws_ami" "ubuntu" {
   filter {
     name   = "name"
     values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+    #values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
   }
 
   filter {
@@ -48,7 +49,7 @@ resource "aws_instance" "master" {
   count                       = 1
   instance_type               = var.master_size
   key_name                    = aws_key_pair.deployer.id 
-  vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_internal_traffic.id]
+  vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_internal_traffic.id, aws_security_group.allow_nodeports.id]
   associate_public_ip_address = true
   subnet_id                   = "${element(random_shuffle.az.result, count.index)}"
  
@@ -64,7 +65,7 @@ resource "aws_instance" "workers" {
   count                       = var.worker_count
   instance_type               = var.worker_size
   key_name                    = aws_key_pair.deployer.id 
-  vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_internal_traffic.id]
+  vpc_security_group_ids      = [aws_security_group.allow_ssh.id, aws_security_group.allow_internal_traffic.id, aws_security_group.allow_nodeports.id]
   associate_public_ip_address = true
   #subnet_id                  = aws_subnet.secondary.id
   subnet_id                   = "${element(random_shuffle.az.result, count.index)}"
