@@ -16,7 +16,7 @@ if [ "$DISTRIB_RELEASE" != "20.04" ]; then
     read
 fi
 
-KUBE_VERSION=1.32.2
+KUBE_VERSION=1.32.5
 
 
 ### setup terminal

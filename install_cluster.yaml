@@ -1,12 +1,30 @@
-- name: install Master node
+- name: install Kubeadm cluster
   hosts: all
   become: true
   vars:
     playbook_lock: /home/ubuntu/deployed.txt
+    use_cilium: true
+    pod_network_cidr: '100.64.0.0/14'
+    service_cidr: '100.68.0.0/16'
+    cilium_version: '1.17.4'
   tasks:
 
-    - name: Install master node
-      ansible.builtin.script: scripts/install_master.sh
+    - name: Get master IP from terraform output file
+      ansible.builtin.include_vars:
+        file: master_private_ip.yaml
+        name: master
+      delegate_to: localhost
+      when: inventory_hostname in groups['master'] and use_cilium
+
+    - name: Template master node
+      ansible.builtin.template:
+        src: templates/install_master.sh.j2
+        dest: /tmp/install_master.sh
+      delegate_to: localhost
+      when: inventory_hostname in groups['master'] and use_cilium
+
+    - name: execute master node script
+      ansible.builtin.script: /tmp/install_master.sh
       args:
         executable: /bin/bash
         creates: "{{ playbook_lock }}"
@@ -18,7 +36,6 @@
         executable: /bin/bash
         creates: "{{ playbook_lock }}"
       when: inventory_hostname in groups['worker']
-
 
     - name: Get token 
       ansible.builtin.command: kubeadm token create --print-join-command
@@ -49,6 +66,21 @@
       ansible.builtin.file:
         path: "{{ playbook_lock }}"
         state: touch
+
+    - name: Add cilium chart repo
+      kubernetes.core.helm_repository:
+        name: cilium
+        repo_url: "https://helm.cilium.io/"
+      when: inventory_hostname in groups['master'] and use_cilium
+
+    - name: Deploy Cilium
+      kubernetes.core.helm:
+        name: cilium
+        chart_ref: cilium/cilium
+        chart_version: "{{ cilium_version }}"
+        namespace: kube-system
+        values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
+      when: inventory_hostname in groups['master'] and use_cilium
 
     - name: show master ip
       ansible.builtin.debug:
