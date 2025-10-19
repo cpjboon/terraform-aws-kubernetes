@@ -11,3 +11,7 @@ ipam:
   operator:
     clusterPoolIPv4PodCIDRList:
     - "{{ pod_network_cidr }}"
+
+encryption:
+  enabled: {{ cilium_use_encryption }}
+  type: {{ cilium_encryption_type }}

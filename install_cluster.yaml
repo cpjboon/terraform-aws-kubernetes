@@ -3,10 +3,14 @@
   become: true
   vars:
     playbook_lock: /home/ubuntu/deployed.txt
-    use_cilium: true
+    use_cilium: "yes"
     pod_network_cidr: '100.64.0.0/14'
     service_cidr: '100.68.0.0/16'
-    cilium_version: '1.17.4'
+    cilium_version: '1.17.8'
+    cilium_use_encryption: "no"
+    # cilium_encryption_type can be ipsec or wireguard
+    cilium_encryption_type: wireguard
+
   tasks:
 
     - name: Get master IP from terraform output file
@@ -14,14 +18,14 @@
         file: master_private_ip.yaml
         name: master
       delegate_to: localhost
-      when: inventory_hostname in groups['master'] and use_cilium
+      when: inventory_hostname in groups['master']
 
     - name: Template master node
       ansible.builtin.template:
         src: templates/install_master.sh.j2
         dest: /tmp/install_master.sh
       delegate_to: localhost
-      when: inventory_hostname in groups['master'] and use_cilium
+      when: inventory_hostname in groups['master']
 
     - name: execute master node script
       ansible.builtin.script: /tmp/install_master.sh
@@ -53,6 +57,7 @@
     - name: print fact
       ansible.builtin.debug:
         var: execute_this
+      when: inventory_hostname in groups['master']
 
     - name: execute command on workers
       ansible.builtin.command: "{{ execute_this }}"
@@ -71,7 +76,7 @@
       kubernetes.core.helm_repository:
         name: cilium
         repo_url: "https://helm.cilium.io/"
-      when: inventory_hostname in groups['master'] and use_cilium
+      when: inventory_hostname in groups['master'] and use_cilium == "yes"
 
     - name: Deploy Cilium
       kubernetes.core.helm:
@@ -80,7 +85,7 @@
         chart_version: "{{ cilium_version }}"
         namespace: kube-system
         values: "{{ lookup('template', 'values.yaml.j2') | from_yaml }}"
-      when: inventory_hostname in groups['master'] and use_cilium
+      when: inventory_hostname in groups['master'] and use_cilium == "yes"
 
     - name: show master ip
       ansible.builtin.debug:
